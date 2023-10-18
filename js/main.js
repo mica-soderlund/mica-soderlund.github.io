@@ -13,12 +13,14 @@ function addItem() {
         todoList.appendChild(todoItem);
         newTodoEl.value = "";
         displayMessage("");
+    // Uppdaterat lagrat data vid tillägg av nytt item
+        updateStorage(); 
     } else {
         displayMessage("Texten måste innehålla minst fem tecken.");
     }
 }
 
-// Funktion för att radera en sak att göra
+// Funktion för att radera en sak att göra i listan
 function deleteItem() {
     let clickedItem = this;
     let todoList = document.getElementById("todolist");
@@ -26,7 +28,7 @@ function deleteItem() {
     updateStorage();
 }
 
-// Funktion för att kontrollera om inmatningstext innehåller minst fem eller fler tecken
+// Funktion för att kontrollera om text innehåller fem eller fler tecken
 function checkItemText(text) {
     return text.length >= 5;
 }
@@ -35,16 +37,18 @@ function checkItemText(text) {
 function loadStorage() {
     let storedItems = localStorage.getItem("items");
     let todoList = document.getElementById("todolist");
-    todoList.innerHTML = storedItems || "";
-
-    // Lägg till event listeners för radering på laddning
-    let todoItems = document.querySelectorAll("#todolist article");
-    todoItems.forEach(item => {
-        item.addEventListener("click", deleteItem);
-    });
+    if (storedItems) {
+     // Uppdaterat innehållet med lagrad data
+        todoList.innerHTML = storedItems;
+        // Lägg till event listeners för radering på laddning
+        let todoItems = document.querySelectorAll("#todolist article");
+        todoItems.forEach(item => {
+            item.addEventListener("click", deleteItem);
+        });
+    }
 }
 
-// Funktion för lagring av inmatning till web storage
+// Funktion för lagring av inmatning till web storaged
 function storeItem(item) {
     let storedItems = localStorage.getItem("items");
     if (!storedItems) {
@@ -57,10 +61,12 @@ function storeItem(item) {
 // Funktion för uppdatering av lagrat data i web storage
 function updateStorage() {
     let todoList = document.getElementById("todolist");
-    localStorage.setItem("items", todoList.innerHTML);
+    let articles = todoList.querySelectorAll("article");
+    let itemTexts = Array.from(articles).map(article => article.outerHTML);
+    localStorage.setItem("items", itemTexts.join(''));
 }
 
-// Funktion för rensning av lagrat data i web storage
+// Funktion för rensning av lagrat data 
 function clearStorage() {
     localStorage.removeItem("items");
     let todoList = document.getElementById("todolist");
@@ -73,7 +79,7 @@ function displayMessage(message) {
     messageElement.textContent = message;
 }
 
-// Lägg till händelsehanterare vid inladdning av sidan
+// Lägger till händelsehanterare vid inladdning av webbsidan
 window.onload = loadStorage;
 document.getElementById("newtodobutton").addEventListener("click", addItem);
 document.getElementById("clearbutton").addEventListener("click", clearStorage);
